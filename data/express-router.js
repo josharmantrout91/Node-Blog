@@ -107,6 +107,9 @@ router.get("/posts/:id", async (req, res) => {
   }
 });
 
+// Add an endpoint to retrieve the list of posts for a user.
+// This should take in a user_id and return the posts with that id
+
 // ********** UPDATE METHODS ********** //
 
 // PUT to /api/posts/:id - Updates the post with the specified id using data from the request body. Returns the modified document, NOT the original.
@@ -134,7 +137,38 @@ router.put("/posts/:id", async (req, res) => {
 
 // ********** DELETE METHODS ********** //
 
-//Add an endpoint to retrieve the list of posts for a user.
-// This should take in a user_id and return the posts with that id
+// DELETE to /api/users/:id
+router.delete("/users/:id", async (req, res) => {
+  try {
+    count = await userDb.remove(req.params.id);
+    if (count) {
+      res.status(200).json({ message: "The user has fallen to the Dark Lord" });
+    } else {
+      res
+        .status(404)
+        .json({ message: "The user with the specified ID does not exist." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "The user could not be removed" });
+  }
+});
+
+// DELETE to /api/posts/:id
+router.delete("/posts/:id", async (req, res) => {
+  try {
+    count = await postDb.remove(req.params.id);
+    if (count) {
+      res
+        .status(200)
+        .json({ message: "The post has been cast into the fires of Mordor" });
+    } else {
+      res
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "The post could not be removed" });
+  }
+});
 
 module.exports = router;
