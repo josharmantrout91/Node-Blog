@@ -5,6 +5,8 @@ const userDb = require("./helpers/userDb.js");
 
 const router = express.Router();
 
+// ********** CREATE METHODS ********** //
+
 // POST request to /api/users
 router.post("/users", async (req, res) => {
   try {
@@ -42,6 +44,8 @@ router.post("/posts", async (req, res) => {
     });
   }
 });
+
+// ********** READ METHODS ********** //
 
 // GET request to /api/users
 router.get("/users/", async (req, res) => {
@@ -102,5 +106,35 @@ router.get("/posts/:id", async (req, res) => {
     res.status(500).json({ error: "The post you seek... it is not here." });
   }
 });
+
+// ********** UPDATE METHODS ********** //
+
+// PUT to /api/posts/:id - Updates the post with the specified id using data from the request body. Returns the modified document, NOT the original.
+router.put("/posts/:id", async (req, res) => {
+  try {
+    updated = await postDb.update(req.params.id, req.body);
+
+    if (!req.params.id) {
+      res
+        .status(404)
+        .json({ message: "The post with the specified ID does not exist." });
+    } else if (req.body.text && req.body.user_id) {
+      res.status(200).json(updated);
+    } else {
+      res.status(400).json({
+        errorMessage: "Please provide text and user id for the post."
+      });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "The post information could not be modified." });
+  }
+});
+
+// ********** DELETE METHODS ********** //
+
+//Add an endpoint to retrieve the list of posts for a user.
+// This should take in a user_id and return the posts with that id
 
 module.exports = router;
