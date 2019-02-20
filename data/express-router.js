@@ -5,6 +5,44 @@ const userDb = require("./helpers/userDb.js");
 
 const router = express.Router();
 
+// POST request to /api/users
+router.post("/users", async (req, res) => {
+  try {
+    const user = await userDb.insert(req.body);
+
+    if (user) {
+      res.status(201).json(user);
+    } else {
+      res.status(400).json({
+        errorMessage: "Ay! We need a valid user up in here!"
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      error: "I'm terribly sorry... we were unable to save your user"
+    });
+  }
+});
+
+// POST request to /api/posts
+router.post("/posts", async (req, res) => {
+  try {
+    const post = await postDb.insert(req.body);
+
+    if (req.body.text && req.body.user_id) {
+      res.status(201).json(post);
+    } else {
+      res.status(400).json({
+        errorMessage: "Please provide text and user id for the post."
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      error: "There was an error while saving the post to the database"
+    });
+  }
+});
+
 // GET request to /api/users
 router.get("/users/", async (req, res) => {
   try {
