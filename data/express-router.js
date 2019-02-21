@@ -3,12 +3,23 @@ const express = require("express");
 const postDb = require("./helpers/postDb.js");
 const userDb = require("./helpers/userDb.js");
 
+function checkUpperCase() {
+  return function(req, res, next) {
+    let userName = req.headers.name;
+    if (userName.toUpperCase === userName) {
+      next();
+    } else {
+      res.status(404).json("Invalid username");
+    }
+  };
+}
+
 const router = express.Router();
 
 // ********** CREATE METHODS ********** //
 
 // POST request to /api/users
-router.post("/users", async (req, res) => {
+router.post("/users", checkUpperCase, async (req, res) => {
   try {
     const user = await userDb.insert(req.body);
 
@@ -109,6 +120,25 @@ router.get("/posts/:id", async (req, res) => {
 
 // Add an endpoint to retrieve the list of posts for a user.
 // This should take in a user_id and return the posts with that id
+
+router.get("/users/:id/posts", async (req, res) => {
+  try {
+    const userPosts = await userDb.getUserPosts(req.params.id);
+
+    if (userPosts) {
+      res.status(200).json(userPosts);
+    } else {
+      res
+        .status(404)
+        .json({ error: "You must be crazy, that user doesnt have any posts!" });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      error: "I dunno where that user has their posts, but they aint here!"
+    });
+  }
+});
 
 // ********** UPDATE METHODS ********** //
 
